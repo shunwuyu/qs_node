@@ -16,7 +16,7 @@ const server = http.createServer((req, res) => {
         console.log('出错了');
         return;
       }
-      console.log(data);
+      // console.log(data);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'text/html');
       res.end(data);

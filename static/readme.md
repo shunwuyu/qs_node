@@ -12,3 +12,7 @@
       - 配置文件返回类型
     - 由路径 到__dirname 得到绝对地址
       - fs.exists 文件是否存在
+      - fs.statSync 文件的详情， 同步 找到mtime
+      > mtime 最后修改时间
+      > 304 Not Modified
+      req.headers['if-modified-since'] && lastModified == req.headers['if-modified-since']

@@ -24,17 +24,35 @@ exports.getStaticFile = (pathname, req, res) => {
       res.write('Sorry, Not Found this Source.');
       res.end();
     } else {
-      fs.readFile(realPath, "binary", function(err, file){
-        if(err){
+      var fileInfo = fs.statSync(realPath);
+      // console.log(fileInfo);
+      var lastModified = fileInfo.mtime.toUTCString();
+      console.log(lastModified);
+      if(mimeConf[extname]) {
+        var date = new Date();
+        date.setTime(date.getTime() + CACHE_TIME * 1000);
+        res.setHeader('Expires', date.toUTCString());
+        res.setHeader('Cache-Control', 'max-age=' + CACHE_TIME);
+        res.setHeader('Last-Modified', lastModified);
+      }
+      // console.log('-----');
+      // console.log(lastModified == req.headers['if-modified-since']);
+      // console.log('-----');
+      if (req.headers['if-modified-since'] && lastModified == req.headers['if-modified-since']) {
+        res.writeHead(304, 'Not Modified');
+        res.end();
+      } else {
+        fs.readFile(realPath, 'binary', function(err, file) {
+          if (err) {
             res.writeHead(500, {'Content-Type': 'text/plain'});
             res.end(err);
-        }else{
-            console.log(mimeType);
+          } else {
             res.writeHead(200, {'Content-Type': mimeType});
-            res.write(file, "binary");
+            res.write(file, 'binary');
             res.end();
-        }
-      })
+          }
+        })
+      }
     }
   })
 }
